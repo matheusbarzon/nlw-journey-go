@@ -19,6 +19,9 @@ Rodar o conteudo do arquivo `.env` (exemplo em `.env.example`)
 ## Package para criação de código em Go (boilerplate)
 ### **goapi-gen**  
 Pegar swagger e transformar em entidades/struct do go
+
+Também estamos usando o `github.com/go-playground/validator` através das tags `x-go-extra-tags`para validar nosso JSON
+
 Instalação
 ```
 go install github.com/discord-gophers/goapi-gen@latest
@@ -66,6 +69,7 @@ type API struct {}
 Dentro do `go.gen` usamos os boilerplate para facilitar manutenção e geração de novos arquivos
 Exemplo do arquivo
 ```
+//go:generate goapi-gen --package=spec --out ./internal/api/spec/journey.spec.go ./internal/api/spec/journey.spec.json
 //go:generate tern migrate --migrations ./internal/pgstore/migrations --config ./internal/pgstore/migrations/tern.conf
 //go:generate sqlc generate -f ./internal/pgstore/sqlc.yml
 ```
@@ -74,10 +78,6 @@ Para chamar o `go.gen`
 ```
 go generate ./...
 ```
-
-
-
-
 
 ## Comandos úteis
 - Baixar dependencias que o projeto precisa para executar

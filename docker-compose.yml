@@ -37,8 +37,21 @@ services:
     depends_on:
       - db
 
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    volumes:
+      - mailpit:/data
+    ports:
+      - 1025:1025
+      - 8025:8025
+    environment:
+      MP_DATABASE: /data/mailpit.db
+
 volumes:
   db:
     driver: local
   pgadmin:
+    driver: local
+  mailpit:
     driver: local
