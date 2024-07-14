@@ -1,0 +1,419 @@
+{
+	"info": {
+		"_postman_id": "df649e28-e41e-42ca-852b-4a50e0f5884a",
+		"name": "nlw-journey",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15812696"
+	},
+	"item": [
+		{
+			"name": "trips",
+			"item": [
+				{
+					"name": "{tripId}",
+					"item": [
+						{
+							"name": "activities",
+							"item": [
+								{
+									"name": "Get activities of a trip",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/trips/:tripid/activities",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"trips",
+												":tripid",
+												"activities"
+											],
+											"variable": [
+												{
+													"key": "tripid",
+													"value": "{{trip_id}}",
+													"type": "string"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create activities for a trip",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"occurs_at\": \"2025-07-01T17:30:00Z\",\n  \"title\": \"segunda atividade\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/trips/:tripid/activities",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"trips",
+												":tripid",
+												"activities"
+											],
+											"variable": [
+												{
+													"key": "tripid",
+													"value": "{{trip_id}}",
+													"type": "string"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "confirm",
+							"item": [
+								{
+									"name": "Get confimed participants",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/trips/:tripid/confirm",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"trips",
+												":tripid",
+												"confirm"
+											],
+											"variable": [
+												{
+													"key": "tripid",
+													"value": "{{trip_id}}",
+													"type": "string"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "invites",
+							"item": [
+								{
+									"name": "Invite a participant",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"user@example.com\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/trips/:tripId/invites",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"trips",
+												":tripId",
+												"invites"
+											],
+											"variable": [
+												{
+													"key": "tripId",
+													"value": "{{trip_id}}",
+													"type": "string"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "links",
+							"item": [
+								{
+									"name": "Get trip link",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/trips/:tripid/links",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"trips",
+												":tripid",
+												"links"
+											],
+											"variable": [
+												{
+													"key": "tripid",
+													"value": "{{trip_id}}",
+													"type": "string"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create a trip link",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"link da viagem\",\n  \"url\": \"http://algummcoisa.com\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/trips/:tripid/links",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"trips",
+												":tripid",
+												"links"
+											],
+											"variable": [
+												{
+													"key": "tripid",
+													"value": "{{trip_id}}",
+													"type": "string"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Get a trip",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/trips/:tripid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"trips",
+										":tripid"
+									],
+									"variable": [
+										{
+											"key": "tripid",
+											"value": "{{trip_id}}",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a trip",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"destination\": \"alemanha\",\n    \"ends_at\": \"2025-07-21T17:30:00Z\",\n    \"starts_at\": \"2025-07-01T17:30:00Z\",\n    \"is_confirmed\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/trips/:tripid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"trips",
+										":tripid"
+									],
+									"variable": [
+										{
+											"key": "tripid",
+											"value": "{{trip_id}}",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get participants",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/trips/:tripid/participants",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"trips",
+										":tripid",
+										"participants"
+									],
+									"variable": [
+										{
+											"key": "tripid",
+											"value": "{{trip_id}}",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create a new trip",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.collectionVariables.set(\"trip_id\", pm.response.json().tripId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"destination\": \"frança\",\n    \"starts_at\": \"2025-07-01T17:30:00Z\",\n    \"ends_at\": \"2025-07-21T17:30:00Z\",\n    \"emails_to_invite\" : [\n        \"pessoa@gmail.com\",\n        \"duda@gmail.com\"\n    ],\n    \"owner_name\": \"Pedro\",\n    \"owner_email\": \"pedro@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/trips",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"trips"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "participants",
+			"item": [
+				{
+					"name": "{participantid}",
+					"item": [
+						{
+							"name": "confirm",
+							"item": [
+								{
+									"name": "Confirm a participant on a trip",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "text"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/participants/:participantId/confirm",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"participants",
+												":participantId",
+												"confirm"
+											],
+											"variable": [
+												{
+													"key": "participantId",
+													"value": "706dd596-ae7e-4930-904a-ddcfc2b569d2",
+													"type": "string"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "trip_id",
+			"value": "preenchido automaticamente",
+			"type": "string"
+		}
+	]
+}
