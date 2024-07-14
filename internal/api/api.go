@@ -193,12 +193,7 @@ func (api API) PutTripsTripID(w http.ResponseWriter, r *http.Request, tripID str
 		)
 	}
 
-	if tripID != body.ID.String() {
-		return spec.PutTripsTripIDJSON400Response(
-			spec.Error{Message: "trip ID specified in the path does not match the trip id in the request body"},
-		)
-	}
-
+	body.ID = id
 	if err := api.store.UpdateTrip(r.Context(), body); err != nil {
 		api.logger.Error("failed to update trip", zap.Error(err), zap.String("trip: ", fmt.Sprint(body)))
 		return spec.PutTripsTripIDJSON400Response(
