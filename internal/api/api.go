@@ -19,14 +19,16 @@ import (
 
 type store interface {
 	CreateActivity(ctx context.Context, arg pgstore.CreateActivityParams) (uuid.UUID, error)
+	CreateTripLink(ctx context.Context, arg pgstore.CreateTripLinkParams) (uuid.UUID, error)
 	CreateTrip(ctx context.Context, pool *pgxpool.Pool, params spec.CreateTripRequest) (uuid.UUID, error)
 
 	ConfirmParticipant(ctx context.Context, participantID uuid.UUID) error
 
-	GetTrip(ctx context.Context, tripID uuid.UUID) (pgstore.Trip, error)
 	GetParticipant(ctx context.Context, particpantID uuid.UUID) (pgstore.Participant, error)
 	GetParticipants(ctx context.Context, tripID uuid.UUID) ([]pgstore.Participant, error)
+	GetTrip(ctx context.Context, tripID uuid.UUID) (pgstore.Trip, error)
 	GetTripActivities(ctx context.Context, tripID uuid.UUID) ([]pgstore.Activity, error)
+	GetTripLinks(ctx context.Context, tripID uuid.UUID) ([]pgstore.Link, error)
 
 	UpdateTrip(ctx context.Context, params pgstore.UpdateTripParams) error
 }
@@ -340,13 +342,104 @@ func (api API) PostTripsTripIDInvites(w http.ResponseWriter, r *http.Request, tr
 // Get a trip links.
 // (GET /trips/{tripId}/links)
 func (api API) GetTripsTripIDLinks(w http.ResponseWriter, r *http.Request, tripID string) *spec.Response {
-	panic("not implemented") // TODO: Implement
+	id, err := uuid.Parse(tripID)
+	if err != nil {
+		return spec.GetTripsTripIDLinksJSON400Response(
+			spec.Error{Message: "uuid invalid"},
+		)
+	}
+
+	if _, err := api.store.GetTrip(r.Context(), id); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return spec.GetTripsTripIDLinksJSON400Response(
+				spec.Error{Message: "trip not found"},
+			)
+		}
+
+		api.logger.Error("failed do get trip", zap.Error(err), zap.String("trip_id", tripID))
+		return spec.GetTripsTripIDLinksJSON400Response(
+			spec.Error{Message: "something went wrong, try again"},
+		)
+	}
+
+	links, err := api.store.GetTripLinks(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return spec.GetTripsTripIDLinksJSON400Response(
+				spec.Error{Message: "link not found"},
+			)
+		}
+	}
+
+	var responseLink = []spec.GetLinksResponseArray{}
+	for _, v := range links {
+		responseLink = append(
+			responseLink,
+			spec.GetLinksResponseArray{
+				ID:    v.ID.String(),
+				Title: v.Title,
+				URL:   v.Url,
+			},
+		)
+	}
+
+	return spec.GetTripsTripIDLinksJSON200Response(
+		spec.GetLinksResponse{
+			Links: responseLink,
+		},
+	)
 }
 
 // Create a trip link.
 // (POST /trips/{tripId}/links)
 func (api API) PostTripsTripIDLinks(w http.ResponseWriter, r *http.Request, tripID string) *spec.Response {
-	panic("not implemented") // TODO: Implement
+	id, err := uuid.Parse(tripID)
+	if err != nil {
+		return spec.PostTripsTripIDLinksJSON400Response(
+			spec.Error{Message: "uuid invalid"},
+		)
+	}
+
+	if _, err := api.store.GetTrip(r.Context(), id); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return spec.PostTripsTripIDLinksJSON400Response(
+				spec.Error{Message: "trip not found"},
+			)
+		}
+
+		api.logger.Error("failed do get trip", zap.Error(err), zap.String("trip_id", tripID))
+		return spec.PostTripsTripIDLinksJSON400Response(
+			spec.Error{Message: "something went wrong, try again"},
+		)
+	}
+
+	var body = pgstore.CreateTripLinkParams{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return spec.PostTripsTripIDLinksJSON400Response(
+			spec.Error{Message: "invalid json " + err.Error()},
+		)
+	}
+
+	if err := api.validator.Struct(body); err != nil {
+		return spec.PostTripsTripIDLinksJSON400Response(
+			spec.Error{Message: "invalid input " + err.Error()},
+		)
+	}
+
+	body.TripID = id
+	linkId, err := api.store.CreateTripLink(r.Context(), body)
+	if err != nil {
+		api.logger.Error("failed to create a link", zap.Error(err), zap.String("link: ", fmt.Sprint(body)))
+		return spec.PostTripsTripIDLinksJSON400Response(
+			spec.Error{Message: "failed to create a link, try again"},
+		)
+	}
+
+	return spec.PostTripsTripIDLinksJSON201Response(
+		spec.CreateLinkResponse{
+			LinkID: linkId.String(),
+		},
+	)
 }
 
 // Get a trip participants.
