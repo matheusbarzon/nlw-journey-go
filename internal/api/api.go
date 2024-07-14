@@ -30,6 +30,8 @@ type store interface {
 	GetTripActivities(ctx context.Context, tripID uuid.UUID) ([]pgstore.Activity, error)
 	GetTripLinks(ctx context.Context, tripID uuid.UUID) ([]pgstore.Link, error)
 
+	InviteParticipantsToTrip(ctx context.Context, arg []pgstore.InviteParticipantsToTripParams) (int64, error)
+
 	UpdateTrip(ctx context.Context, params pgstore.UpdateTripParams) error
 }
 
@@ -336,7 +338,53 @@ func (api API) GetTripsTripIDConfirm(w http.ResponseWriter, r *http.Request, tri
 // Invite someone to the trip.
 // (POST /trips/{tripId}/invites)
 func (api API) PostTripsTripIDInvites(w http.ResponseWriter, r *http.Request, tripID string) *spec.Response {
-	panic("not implemented") // TODO: Implement
+	id, err := uuid.Parse(tripID)
+	if err != nil {
+		return spec.PostTripsTripIDInvitesJSON400Response(
+			spec.Error{Message: "uuid invalid"},
+		)
+	}
+
+	if _, err := api.store.GetTrip(r.Context(), id); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return spec.PostTripsTripIDInvitesJSON400Response(
+				spec.Error{Message: "trip not found"},
+			)
+		}
+
+		api.logger.Error("failed do get trip", zap.Error(err), zap.String("trip_id", tripID))
+		return spec.PostTripsTripIDInvitesJSON400Response(
+			spec.Error{Message: "something went wrong, try again"},
+		)
+	}
+
+	var body = pgstore.InviteParticipantsToTripParams{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return spec.PostTripsTripIDInvitesJSON400Response(
+			spec.Error{Message: "invalid json " + err.Error()},
+		)
+	}
+
+	if err := api.validator.Struct(body); err != nil {
+		return spec.PostTripsTripIDInvitesJSON400Response(
+			spec.Error{Message: "invalid input " + err.Error()},
+		)
+	}
+
+	body.TripID = id
+	if _, err = api.store.InviteParticipantsToTrip(
+		r.Context(),
+		[]pgstore.InviteParticipantsToTripParams{
+			body,
+		},
+	); err != nil {
+		api.logger.Error("failed to invite participant", zap.Error(err), zap.String("activity: ", fmt.Sprint(body)))
+		return spec.PostTripsTripIDInvitesJSON400Response(
+			spec.Error{Message: "failed to invite participant, try again"},
+		)
+	}
+
+	return spec.PostTripsTripIDInvitesJSON201Response(nil)
 }
 
 // Get a trip links.
